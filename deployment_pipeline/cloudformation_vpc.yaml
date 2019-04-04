@@ -1,0 +1,409 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Polly Whitepapers VPC template.  Authors - AWS Study Gurus
+
+
+Parameters:
+
+  CIDRRangePrefix:
+    Description: 'Provide a valid Class-B CIDR Block Range.'
+    ConstraintDescription: 'Must provide the first two octets seperated by a period. ( Example: "10.250" )'
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){1}\d{1,3}'
+    MinLength: 3
+    MaxLength: 7
+
+  HostedZoneName:
+    Description: 'Provide a valid internal Domain Name for the crawler.'
+    ConstraintDescription: 'Must provide valid internal Domain Name. ( Example: "pollywhitepapers.com" )'
+    Type: String
+    Default: private.adrianws.com
+
+  ProvisionNATgateways:
+    Description: 'NAT Gateways are expensive for personal projects.  This is a feature to not create them'
+    ConstraintDescription: 'true or false'
+    Type: String
+    Default: false
+
+Conditions: 
+  ProvisionNATgateways: !Equals [ !Ref ProvisionNATgateways, true ]
+
+Resources:
+
+
+
+
+  CustomVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Sub "${CIDRRangePrefix}.0.0/16"
+      InstanceTenancy: default
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+
+############################################################
+#### Subnet: External
+############################################################
+  SubnetExternalA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      MapPublicIpOnLaunch: true
+      CidrBlock: !Sub "${CIDRRangePrefix}.1.0/24"
+      AvailabilityZone: !Sub "${AWS::Region}a"
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "Subnet-${AWS::StackName}-External-A"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  SubnetExternalB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      MapPublicIpOnLaunch: true
+      CidrBlock: !Sub "${CIDRRangePrefix}.11.0/24"
+      AvailabilityZone: !Sub "${AWS::Region}b"
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "Subnet-${AWS::StackName}-External-B"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  RtbExternal:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "RTB-${AWS::StackName}-External"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+
+
+  RouteRtbExternaltoANYoverIGW:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RtbExternal
+      GatewayId: !Ref InternetGW
+
+  SubnetACLExternalZoneA:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetworkACL
+      SubnetId: !Ref SubnetExternalA
+  
+  SubnetACLExternalZoneB:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetworkACL
+      SubnetId: !Ref SubnetExternalB
+  
+  SubnetExternalZoneARoute:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RtbExternal
+      SubnetId: !Ref SubnetExternalA
+  
+  SubnetExternalZoneBRoute:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RtbExternal
+      SubnetId: !Ref SubnetExternalB
+
+
+
+############################################################
+#### Subnet: Server
+############################################################
+  SubnetServerA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !Sub "${CIDRRangePrefix}.3.0/24"
+      AvailabilityZone: !Sub "${AWS::Region}a"
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "Subnet-${AWS::StackName}-Server-A"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+  
+  RtbServerZoneA:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "RTB-${AWS::StackName}-Server-A"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  RouteServerZoneAtoANYoverNATGWA:
+    Condition: ProvisionNATgateways
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId:
+        Ref: RtbServerZoneA
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGWZoneA
+  
+  SubnetServerB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !Sub "${CIDRRangePrefix}.13.0/24"
+      AvailabilityZone: !Sub "${AWS::Region}b"
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "Subnet-${AWS::StackName}-Server-B"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  RtbServerZoneB:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "RTB-${AWS::StackName}-Server-B"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  RouteServerZoneBtoANYoverNATGWB:
+    Condition: ProvisionNATgateways
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId:
+        Ref: RtbServerZoneB
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGWZoneB
+
+  DHCPOptions:
+    Type: 'AWS::EC2::DHCPOptions'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Default DHCP Options
+      DomainName: us-west-2.compute.internal
+      DomainNameServers:
+        - AmazonProvidedDNS
+
+  SubnetACLServerZoneA:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetworkACL
+      SubnetId: !Ref SubnetServerA
+  SubnetACLServerZoneB:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetworkACL
+      SubnetId: !Ref SubnetServerB
+  SubnetServerZoneARoute:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RtbServerZoneA
+      SubnetId: !Ref SubnetServerA
+  SubnetServerZoneBRoute:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RtbServerZoneB
+      SubnetId: !Ref SubnetServerB
+  NetworkACL:
+    Type: 'AWS::EC2::NetworkAcl'
+    Properties:
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "ACL-${AWS::StackName}"
+
+  InternetGW:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "IGW-${AWS::StackName}"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+
+  MyVPCGatewayAttachment:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref InternetGW
+      VpcId: !Ref CustomVPC
+
+
+
+  NATGWZoneA:
+    Condition: ProvisionNATgateways
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - EIPNATGWA
+        - AllocationId
+      SubnetId:
+        Ref: SubnetExternalA
+      Tags:
+        - Key: Name
+          Value: !Sub "NAT-${AWS::StackName}-Zone-A"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+  
+  NATGWZoneB:
+    Condition: ProvisionNATgateways
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - EIPNATGWB
+        - AllocationId
+      SubnetId:
+        Ref: SubnetExternalB
+      Tags:
+        - Key: Name
+          Value: !Sub "NAT-${AWS::StackName}-Zone-B"
+        - Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+  EIPNATGWA:
+    Condition: ProvisionNATgateways
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+  
+  EIPNATGWB:
+    Condition: ProvisionNATgateways
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+
+
+  ACL1:
+    Type: 'AWS::EC2::NetworkAclEntry'
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: 'true'
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref NetworkACL
+
+  ACL2:
+    Type: 'AWS::EC2::NetworkAclEntry'
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref NetworkACL
+
+
+  DHCPAssoc1:
+    Type: 'AWS::EC2::VPCDHCPOptionsAssociation'
+    Properties:
+      VpcId: !Ref CustomVPC
+      DhcpOptionsId: !Ref DHCPOptions
+
+
+
+  PrivateZoneDNS: 
+    Type: "AWS::Route53::HostedZone"
+    Properties: 
+      HostedZoneConfig: 
+        Comment: "My hosted zone for the web crawler"
+      Name: !Ref HostedZoneName
+      VPCs: 
+        - 
+          VPCId: !Ref CustomVPC
+          VPCRegion: !Sub ${AWS::Region}
+      HostedZoneTags: 
+        - 
+          Key: stackname
+          Value: !Sub "${AWS::StackName}"
+
+
+  ClientVPNSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Client VPN Security Group
+      VpcId: !Ref CustomVPC
+      Tags:
+        - Key: Name
+          Value: Client VPN Security Group
+
+
+Outputs:
+
+
+  VPCStackName:
+    Description: "The VPC stack name."
+    Value: !Sub ${AWS::StackName}
+    Export:
+      Name: !Sub ${AWS::StackName}
+
+  VPCID:
+    Description: 'The VPC ID for the Parent VPC.'
+    Value: !Ref CustomVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCID'
+
+  SubnetServerA:
+    Description: Server Subnet in Availability Zone A
+    Value: !Ref SubnetServerA
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetServerA'
+
+  SubnetServerB:
+    Description: Server Subnet in Availability Zone B
+    Value: !Ref SubnetServerB
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetServerB'
+
+  SubnetExternalA:
+    Description: External Subnet in Availability Zone A
+    Value: !Ref SubnetExternalA
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetExternalA'
+
+  SubnetExternalB:
+    Description: External Subnet in Availability Zone B
+    Value: !Ref SubnetExternalB
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetExternalB'
+
+  CustomVPCCidrBlock: 
+    Description: VPC CIDR block
+    Value: !GetAtt CustomVPC.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-CustomVPCCidrBlock'
+
+  SubnetServerACidrBlock: 
+    Description: Server Subnet in Availability Zone A
+    Value: !Sub "${CIDRRangePrefix}.3.0/24"
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetServerACidrBlock'
+
+  PrivateZoneDNSHostedZoneName: 
+    Description: HostedZone Name 
+    Value: !Ref HostedZoneName
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateZoneDNSHostedZoneName'
+
+  PrivateZoneDNSHostedZoneID: 
+    Description: HostedZone output
+    Value: !Ref PrivateZoneDNS
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateZoneDNSHostedZoneID'
+
+
+
+
+

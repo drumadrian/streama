@@ -1,0 +1,352 @@
+#/bin/bash
+
+
+# Notes: 
+    # https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+
+# The purpose of this script is to manage the deployment pipeline 
+#  and the application. 
+
+
+##################################
+# CONFIG VARIABLES
+##################################
+PROJECT_NAME="streama"			#must be lowercase to avoid breaking ECR reposotory name and etc.
+VERSION=0.0.1
+
+AWS_CLI_PROFILE="account1"
+SHORT_COMMIT_VERSION=$(git rev-parse --short HEAD)
+COMMIT_VERSION=$(git rev-parse HEAD)
+COMIMT_DESCRIPTION=$(git log -1 --pretty=%B)
+COMMIT_BRANCH=`git branch | grep \* | cut -d ' ' -f2`
+DEPLOYMENT_PIPELINE_STACK_NAME="$PROJECT_NAME-deployment-pipeline-$COMMIT_BRANCH"
+REPOSITORY_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-repo"
+USER_NAME=$(whoami)
+AWS_ACCOUNT_NUMBER=$(aws sts get-caller-identity --output text --query 'Account' --profile $AWS_CLI_PROFILE)
+ARTIFACT_DEPLOYMENT_BUCKET_NAME=$AWS_ACCOUNT_NUMBER-$DEPLOYMENT_PIPELINE_STACK_NAME 		
+REGION="us-west-2"
+EMAIL_ADDRESS="adrian.drummond@gmail.com"
+ECR_REPO_NAME="$PROJECT_NAME-deployment-pipeline-$COMMIT_BRANCH-ecr-repo"
+ECR_REGISTRY_ID=$(aws sts get-caller-identity --output text --query='Account' --profile $AWS_CLI_PROFILE)
+ECR_IMAGE_TAG="2019.001"
+ECR_IMAGE_MANIFEST="file://deploymentpipeline_image_manifest.js"
+ID_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-id"
+SECRET_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-secret"
+# ID_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-id"
+# SECRET_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-secret"
+# AD_PASSWORD_NAME="$DEPLOYMENT_PIPELINE_STACK_NAME-AD_PASSWORD"
+
+
+
+# LOGFILE="streama.log"
+# echo "Using logfile for $LOGFILE"
+
+red=$'\e[1;31m'
+grn=$'\e[1;32m'
+blu=$'\e[1;34m'
+mag=$'\e[1;35m'
+cyn=$'\e[1;36m'
+white=$'\e[0m'
+
+
+testcolor()
+{
+	echo $red hello in red $white
+}
+
+
+deploy_pipeline()
+{
+	echo $mag
+    echo -e "\n RUNNING: deploy_pipeline() \n"
+    echo $white
+    # echo "Parameter #1 is $1"
+
+    # Create any custom resources not supported by Cloudformation if they don't already exist
+    creds_exists=$(aws ssm get-parameter --name $ID_NAME --profile $AWS_CLI_PROFILE)
+
+    echo -e "Checking for credentials"
+    if [[ -z $creds_exists ]]
+    then
+	    echo -e "credentials Do NOT exists"
+		echo $blu
+	    echo -e "...Creating credentials"
+	   	aws ssm put-parameter --name $ID_NAME --value "default_id" --description 'Use this to identify the software' --type SecureString --profile $AWS_CLI_PROFILE
+	   	aws ssm put-parameter --name $SECRET_NAME --value "default_secret" --description 'Use this to authenticate the software' --type SecureString --profile $AWS_CLI_PROFILE	   
+	   	# aws ssm put-parameter --name $AD_PASSWORD_NAME --value "tuned2850[cowboys" --description 'Use this as the password for AWS DS' --type SecureString --profile $AWS_CLI_PROFILE	   
+    	echo $white
+	else
+		echo $blu
+	    echo -e "credentials Already exists"
+    	# echo " $DEPLOYMENT_PIPELINE_STACK_NAME-id     already exists"
+    	echo "...Skipping credential creation"
+    	echo $white
+    fi
+
+
+	####################################################################################################################################################################################################################################################################################################################################################
+	# NEED TO FIX, ECR PUT-IMAGE WITH BETTER IMAGE MANIFEST. 				TODO				AND NEED TO CREATE REFERENCE IN CODE PIPELINE TO DEPLOYMENT PIPELINE CONTAINER 
+	####################################################################################################################################################################################################################################################################################################################################################
+	# echo $blu
+	# echo -e "\n\n Deploying: image to Deployment Pipeline repository: \n " 
+	# aws ecr put-image --registry-id $ECR_REGISTRY_ID --repository-name $ECR_REPO_NAME --image-manifest $ECR_IMAGE_MANIFEST --image-tag $ECR_IMAGE_TAG --profile $AWS_CLI_PROFILE 
+	# echo $white
+	####################################################################################################################################################################################################################################################################################################################################################
+	# NEED TO FIX, ECR PUT-IMAGE WITH BETTER IMAGE MANIFEST. 				TODO
+	####################################################################################################################################################################################################################################################################################################################################################
+
+	####################################################################################################################################################################################################################################################################################################################################################
+	# echo ARTIFACT_DEPLOYMENT_BUCKET_NAME= 
+	# echo $ARTIFACT_DEPLOYMENT_BUCKET_NAME
+	aws cloudformation deploy --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME --template-file deployment_pipeline/deployment_pipeline.yaml --parameter-overrides Email=$EMAIL_ADDRESS RepositoryNameApp=$REPOSITORY_NAME ArtifactStoreBucketName=$ARTIFACT_DEPLOYMENT_BUCKET_NAME BranchName=$COMMIT_BRANCH IDName=$ID_NAME SecretName=$SECRET_NAME --capabilities CAPABILITY_NAMED_IAM --profile $AWS_CLI_PROFILE
+	####################################################################################################################################################################################################################################################################################################################################################
+
+
+	echo -e "\n Now wait until the Code Commit repository has been created and set it up as a new remote using the convention:  git remote add aws-{BranchName} https://git-codecommit.us-west-2.amazonaws.com/v1/repos/{repositoryName}"
+	sleep 3
+	aws codecommit list-repositories --profile $AWS_CLI_PROFILE
+	REPO_URL=$(aws codecommit get-repository --repository-name $REPOSITORY_NAME --profile $AWS_CLI_PROFILE --output text --query 'repositoryMetadata.cloneUrlHttp')
+	git remote add aws-$COMMIT_BRANCH $REPO_URL
+	echo -e "\n .....if the initial deploy-pipeline execution fails, wait for the pipeline to finish building, and RUN It AGAIN...  The repository reference will be setup after the CodeCommit repo has been provisioned in AWS. "
+
+	echo -e "\n You can copy and paste this if you need to: \n aws codecommit list-repositories --profile " 
+	echo -e "\n You can copy and paste this if you need to: \n aws codecommit get-repository --repository-name {repositoryName} --profile " 
+	echo -e "\n You can copy and paste this if you need to: \n git remote add aws-{BranchName} https://git-codecommit.us-west-2.amazonaws.com/v1/repos/{repositoryName} " 
+
+	echo -e "\n\n Here are your current remote repositories: \n " 
+	git remote -v
+
+
+
+
+
+
+}
+
+
+deploy_app()
+{
+	echo $mag
+    echo -e "\n RUNNING: deploy_app() \n"
+    echo $white
+    # git push origin
+    git push aws-$COMMIT_BRANCH    
+}
+
+
+destroy_pipeline()
+{
+	echo $red
+    echo -e "\n RUNNING: destroy_pipeline() \n"
+    echo $white
+    aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME --profile $AWS_CLI_PROFILE
+   	aws ssm delete-parameter --name $ID_NAME --profile $AWS_CLI_PROFILE
+   	aws ssm delete-parameter --name $SECRET_NAME --profile $AWS_CLI_PROFILE
+   	# aws ssm delete-parameter --name $AD_PASSWORD_NAME --profile $AWS_CLI_PROFILE
+}
+
+
+destroy_app()
+{
+	##########################################################################################
+	#  This section needs to be updated for each specific project 
+	##########################################################################################
+	echo $red
+	echo -e "\n RUNNING: destroy_app() \n"
+	echo $white
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-step-function --profile $AWS_CLI_PROFILE
+	sleep 3
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-lambda-terminate-instances --profile $AWS_CLI_PROFILE
+	sleep 4
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-lambda-launch-instances --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-lambda-create-new-amis --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-lambda-share-amis --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-lambda-create-amis --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-cleanup-sensu --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-activedirectory --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-vpn --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-sensu --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-puppetmaster --profile $AWS_CLI_PROFILE
+	sleep 2
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-cleanup-puppet --profile $AWS_CLI_PROFILE
+	sleep 4
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-cleanup-activedirectory --profile $AWS_CLI_PROFILE
+	sleep 4
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-cleanup-config-lambda --profile $AWS_CLI_PROFILE
+	sleep 4
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-cleanup-octopus --profile $AWS_CLI_PROFILE
+	sleep 4
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-sqs --profile $AWS_CLI_PROFILE
+	sleep 10
+	aws cloudformation delete-stack --stack-name $DEPLOYMENT_PIPELINE_STACK_NAME-vpc --profile $AWS_CLI_PROFILE
+}
+
+
+help()
+{
+
+    echo '''
+
+
+    USAGE: streama [OPTIONS] 
+
+    OPTIONS
+
+	-h     Dispplay this help dialog
+	-p     Displays the streama tool variables 
+	         (varies based on branch)
+
+	-d     Runs with defaults (not yet implemented)
+	-r     Forces a reset (not yet implemented)
+
+	-dp    Creates the Cloudformation stack for the Deployment pipeline
+	         The Deployment pipeline deploys the app code and 
+	         must be created first
+	-da    Pushes the application code to the origin for the Deployment pipeline
+	         The Deployment pipeline must be created first.  Automation 
+	         for the AWS or GitHub pipeline must be setup if needed
+
+	-delp  Deletes the Cloudformation stack and related resources for the Deployment pipeline
+	-dela  Deletes the Cloudformation stacks and related resources for the Application
+
+
+	--help 		    Same as -h
+	--printvariables    Same as -p
+	--deploy-pipeline   Same as -dp
+	--deploy-app 	    Same as -da
+	--destroy-pipeline  Same as -delp
+	--destroy-app	    Same as -dela
+	--default 	    not yet implemented
+	--reset  	    not yet implemented
+
+
+
+    '''
+
+}
+
+
+printvariables()
+{
+	printf "\n\n \n"
+	printf "AWS_CLI_PROFILE = $AWS_CLI_PROFILE \n"
+	printf "SHORT_COMMIT_VERSION = $SHORT_COMMIT_VERSION \n"
+	printf "COMMIT_VERSION = $COMMIT_VERSION \n"
+	printf "COMIMT_DESCRIPTION = $COMIMT_DESCRIPTION \n"
+	printf "COMMIT_BRANCH = $COMMIT_BRANCH \n"
+	printf "DEPLOYMENT_PIPELINE_STACK_NAME = $DEPLOYMENT_PIPELINE_STACK_NAME \n"
+	printf "REPOSITORY_NAME = $REPOSITORY_NAME \n"
+	printf "USER_NAME = $USER_NAME \n"
+	printf "AWS_ACCOUNT_NUMBER = $AWS_ACCOUNT_NUMBER \n"
+	printf "ARTIFACT_DEPLOYMENT_BUCKET_NAME = $ARTIFACT_DEPLOYMENT_BUCKET_NAME \n"
+	printf "REGION = $REGION \n"
+	printf "EMAIL_ADDRESS = $EMAIL_ADDRESS \n"
+	printf "ID_NAME = $ID_NAME \n"
+	printf "SECRET_NAME = $SECRET_NAME \n"
+	# printf "LOGFILE = $LOGFILE \n"
+	printf "Number of files in SEARCH PATH: $(ls -1 | wc -l)"
+	printf "\n\n\n"
+}
+
+
+
+
+##################################
+# START HERE
+##################################
+echo $mag
+printf "\n\n It is `date +%A`, Hello `whoami` \n" 
+echo $white
+
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+	case $key in
+	    -h|-help|--help|--h)
+	    HELP_INPUT="$2"
+	    help
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    -p|--printvariables|--p)
+	    printvariables_INPUT="$2"
+	    printvariables $printvariables_INPUT
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    -dp|--deploy-pipeline|-deploy-pipeline)
+	    deploy_pipeline_INPUT="$2"
+		deploy_pipeline $deploy_pipeline_INPUT
+	    SEARCHPATH="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    -da|--deploy-app|-deploy-app)
+	    deploy_app_INPUT="$2"
+		deploy_app $deploy_app_INPUT
+	    LIBPATH="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    -delp|--destroy-pipeline|-destroy-pipeline)
+	    destroy_pipeline_INPUT="$2"
+		destroy_pipeline $destroy_pipeline_INPUT
+	    SEARCHPATH="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    -dela|--destroy-app|-destroy-app)
+		destroy_app
+	    LIBPATH="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+
+	    --r|--reset|-reset)
+	    RESET=YES
+	    shift # past argument
+	    ;;
+
+	    --default)
+	    DEFAULT=YES
+	    testcolor
+	    shift # past argument
+	    ;;
+
+	    *)    # unknown option
+	    POSITIONAL+=("$1") # save it in an array for later
+	    help
+	    shift # past argument
+	    ;;
+	esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+
+
+
+
+
+
+
+
+
+
+
+

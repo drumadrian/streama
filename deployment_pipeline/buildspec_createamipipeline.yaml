@@ -1,0 +1,87 @@
+########################################################################################################
+########################################################################################################
+#
+#     Just run this file over and over
+#
+#
+########################################################################################################
+########################################################################################################
+
+# Notes:
+
+# This is intended to run in the SIRRR Staging AWS Account 
+# https://docs.aws.amazon.com/cli/latest/reference/cloudformation/create-stack.html
+#  
+
+
+version: 0.2
+
+env:
+  variables:
+    key1: "value1"
+    key2: "value2"
+phases:
+  install:
+    commands:
+      - echo no install necessary
+      # - command
+
+  pre_build:
+    commands:
+      - pwd
+      - ls -al 
+      - echo $CODEBUILD_INITIATOR
+      - CODEBUILD_INITIATOR_SERVICE="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f1)"
+      - CODEBUILD_INITIATOR_NAME="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f2)"
+      - echo $CODEBUILD_INITIATOR_NAME
+      - PIPELINENAME=$CODEBUILD_INITIATOR_NAME
+      - echo PIPELINENAME=
+      - echo $PIPELINENAME      
+
+      ## SET ENVIRONMENT VARIABLES
+      - CODESSMPARAMETERNAME=$PIPELINENAME-coderepoURL
+      - CODECOMMITREPOHTTPSURL=$(aws ssm get-parameter --name $CODESSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $6}')
+      - echo $CODECOMMITREPOHTTPSURL=
+      - echo CODECOMMITREPOHTTPSURL
+
+      - REPONAMESSMPARAMETERNAME=$PIPELINENAME-coderepoName
+      - REPONAMESSMPARAMETER=$(aws ssm get-parameter --name $REPONAMESSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+      - SNSTOPICSSMPARAMETERNAME=$PIPELINENAME-SSMparametercodeSNStopicARN
+      - SNSTOPICSSMPARAMETER=$(aws ssm get-parameter --name $SNSTOPICSSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+  build:
+    commands:
+      - cd deployment_pipeline/
+      # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-cognito --template-file cloudformation_cognito.yaml --parameter-overrides PipelineName=$CODEBUILD_INITIATOR_NAME GitHTTPSURL=$CODECOMMITREPOHTTPSURL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
+      - aws ec2 describe-vpcs
+      - aws s3 ls
+      # - command
+
+  post_build:
+    commands:
+      - echo NO STEPS IN POST_BUILD stage
+      # - command
+
+# artifacts:
+#   files:
+#     # - location
+#     # - location
+#   discard-paths: yes
+#   base-directory: location
+# cache:
+#   paths:
+#     - path
+#     - path
+
+
+
+
+
+
+
+
+
+
+
+
