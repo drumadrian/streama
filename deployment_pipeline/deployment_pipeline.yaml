@@ -626,7 +626,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectbuildvpc:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'buildvpc'] ]
@@ -675,7 +675,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectcreatedatabase:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'createdatabase'] ]
@@ -723,7 +723,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectcreates3buckets:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'creates3buckets'] ]
@@ -770,7 +770,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectcreatecognitopool:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'createcognitopool'] ]
@@ -817,7 +817,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectcreateloadbalancer:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'createloadbalancer'] ]
@@ -864,7 +864,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectbuildlambdas:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'buildlambdas'] ]
@@ -911,7 +911,7 @@ Resources:
 
 
 
-  CodeBuildProjectvpc:
+  CodeBuildProjectcreatetranscoder:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Join [ -, [!Ref 'AWS::StackName', 'createtranscoder'] ]
