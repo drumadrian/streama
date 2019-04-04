@@ -53,9 +53,9 @@ phases:
   build:
     commands:
       - cd deployment_pipeline/
-      # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-cognito --template-file cloudformation_cognito.yaml --parameter-overrides PipelineName=$CODEBUILD_INITIATOR_NAME GitHTTPSURL=$CODECOMMITREPOHTTPSURL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
-      - aws ec2 describe-vpcs
-      - aws s3 ls
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file ami_pipeline.yaml --parameter-overrides PipelineName=$CODEBUILD_INITIATOR_NAME GitHTTPSURL=$CODECOMMITREPOHTTPSURL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
+      # - aws ec2 describe-vpcs
+      # - aws s3 ls
       # - command
 
   post_build:
