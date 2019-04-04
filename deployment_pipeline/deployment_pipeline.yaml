@@ -75,7 +75,6 @@ Resources:
         Status: Enabled
 
 
-
   cleanupBucketOnDelete:
     DependsOn: cleanupBucketOnDeleteLambda
     Type: Custom::cleanupbucket
@@ -84,9 +83,7 @@ Resources:
        Fn::GetAtt: 
           - "cleanupBucketOnDeleteLambda"
           - "Arn"
-      BucketName: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
-      # BucketName: my-test-bucket-cleaning-on-delete
-      # ServiceToken: arn:aws:lambda:eu-west-1:123456789012:function:clean-bucket-lambda
+      BucketName: !Ref ArtifactStoreBucketName
 
 
   cleanupBucketOnDeleteLambda:
@@ -196,6 +193,7 @@ Resources:
       Role : !GetAtt cleanupBucketOnDeleteLambdaRole.Arn
       Runtime: python2.7
       Timeout: 60
+
 
   cleanupBucketOnDeleteLambdaRole:
     Type: AWS::IAM::Role

@@ -1,5 +1,5 @@
 ######
-#Private Netflix
+# Private Netflix
 ######
 
  a video on demand service for documentation
@@ -14,14 +14,14 @@
 
 
 
-#How to save money on EC2
+# How to save money on EC2
 - Replace your manually created Autoscaling Group wiht a Elastigroup from SpotInst. 
 	- [https://spotinst.com/](https://spotinst.com/)
 	-  
 
 
 
-#Your defalut login screen:
+# Your defalut login screen:
 
 ![login image](login.png)
 
@@ -30,7 +30,7 @@
 
 
 
-#How to upload your own videos:
+# How to upload your own videos:
 * Be aware that Streama can provide video is different formats, but the format you provide is of Critical importance to the viewers browser.  *mp4* files are the modern popular format. 
 
 1. Browse to the video upload page here: 
@@ -48,7 +48,7 @@
 
 
 
-#Deployment Pipeline Setup and Usage:
+# Deployment Pipeline Setup and Usage:
 
 
 Setup
@@ -124,17 +124,17 @@ Usage
 
 
 
-#Your AMI Pipeline diagram:
+# Your AMI Pipeline diagram:
 
 ![AMI Pipeline](ami-builder-diagram.png)
 
 
-#Your Serverless database:
+# Your Serverless database:
 [Amazon Aurora] (https://aws.amazon.com/rds/aurora/serverless/)
 
 [ ![Amazon Aurora](database.png) ](https://www.youtube.com/watch?time_continue=3&v=IwyOyGs69N4)
 
-#Notes:
+# Notes:
 What is Video on Demand? 
 
 - [https://en.wikipedia.org/wiki/Video_on_demand](https://en.wikipedia.org/wiki/Video_on_demand)
