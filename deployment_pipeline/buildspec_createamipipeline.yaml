@@ -41,10 +41,10 @@ phases:
       ## SET ENVIRONMENT VARIABLES
       - CODESSMPARAMETERNAME=$PIPELINENAME-coderepoURL
       - CODECOMMITREPOHTTPSURL=$(aws ssm get-parameter --name $CODESSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $6}')
-      - echo $CODECOMMITREPOHTTPSURL=
-      - echo CODECOMMITREPOHTTPSURL
+      - echo CODECOMMITREPOHTTPSURL=
+      - echo $CODECOMMITREPOHTTPSURL
 
-      - REPONAMESSMPARAMETERNAME=$PIPELINENAME-coderepoName
+      - REPONAMESSMPARAMETERNAME=$PIPELINENAME-codecommitrepositoryname
       - REPONAMESSMPARAMETER=$(aws ssm get-parameter --name $REPONAMESSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
 
       - SNSTOPICSSMPARAMETERNAME=$PIPELINENAME-SSMparametercodeSNStopicARN
@@ -58,6 +58,9 @@ phases:
 
       - DEPLOYMENTSUBNETEMAILNAME=$PIPELINENAME-SSMparametercodeSNStopicEMAIL
       - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+      - echo $REPONAMESSMPARAMETERNAME=
+      - echo REPONAMESSMPARAMETERNAME
 
       - echo $DEPLOYMENTVPCPARAMETER=
       - echo DEPLOYMENTVPCPARAMETER
