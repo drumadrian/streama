@@ -450,7 +450,23 @@ Resources:
                 - Name: code
               RunOrder: '1'
 
-        - Name: Create_AMI_Pipeline_and_Build_Network
+        - Name: Build_Network
+          Actions:
+            - Name: Build_VPC
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              InputArtifacts:
+                - Name: code
+              Configuration:
+                ProjectName: !Join [ -, [!Ref 'AWS::StackName', 'buildvpc'] ]
+              RunOrder: '1'
+              OutputArtifacts:
+                - Name: output-buildvpc
+
+        - Name: Create_AMI_Pipeline
           Actions:
             - Name: Create_AMI_Pipeline
               ActionTypeId:
@@ -466,19 +482,6 @@ Resources:
               OutputArtifacts:
                 - Name: output-createamipipeline
 
-            - Name: Build_VPC
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Provider: CodeBuild
-                Version: '1'
-              InputArtifacts:
-                - Name: code
-              Configuration:
-                ProjectName: !Join [ -, [!Ref 'AWS::StackName', 'buildvpc'] ]
-              RunOrder: '1'
-              OutputArtifacts:
-                - Name: output-buildvpc
 
         - Name: Create_Database_Create_S3_Buckets_Create_Cognito_Pool_Create_Load_Balancer
           Actions:

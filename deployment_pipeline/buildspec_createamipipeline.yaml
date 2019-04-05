@@ -59,6 +59,15 @@ phases:
       - DEPLOYMENTSUBNETEMAILNAME=$PIPELINENAME-SSMparametercodeSNStopicEMAIL
       - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text | awk '{print $4}')
 
+      - echo $DEPLOYMENTVPCPARAMETER=
+      - echo DEPLOYMENTVPCPARAMETER
+
+      - echo $DEPLOYMENTSUBNETPARAMETER=
+      - echo DEPLOYMENTSUBNETPARAMETER
+
+      - echo $DEPLOYMENTSUBNETEMAIL=
+      - echo DEPLOYMENTSUBNETEMAIL
+
 
   build:
     commands:
