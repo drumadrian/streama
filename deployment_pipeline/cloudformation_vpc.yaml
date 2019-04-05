@@ -340,6 +340,25 @@ Resources:
           Value: Client VPN Security Group
 
 
+  SSMparameterVPCID:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The VPC ID of the deployment VPC 
+      Name: !Sub "${AWS::StackName}-SSMparameterVPCID"
+      Type: String
+      Value: !Ref CustomVPC
+
+
+  SSMparameterAMISUBNET:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The VPC ID of the deployment VPC SUBNET ID
+      Name: !Sub "${AWS::StackName}-SSMparameterAMISUBNET"
+      Type: String
+      Value: !Ref SubnetServerA
+
+
+
 Outputs:
 
 

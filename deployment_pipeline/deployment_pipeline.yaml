@@ -1299,6 +1299,15 @@ Resources:
       Value: !Ref CodePipelineSNSTopic
 
 
+  SSMparametercodeSNStopicEMAIL:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The topic name of the shared SNS topic 
+      Name: !Sub "${AWS::StackName}-SSMparametercodeSNStopicEMAIL"
+      Type: String
+      Value: !Ref Email
+
+
 
 
 

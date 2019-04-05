@@ -50,10 +50,22 @@ phases:
       - SNSTOPICSSMPARAMETERNAME=$PIPELINENAME-SSMparametercodeSNStopicARN
       - SNSTOPICSSMPARAMETER=$(aws ssm get-parameter --name $SNSTOPICSSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
 
+      - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-SSMparameterVPCID
+      - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+      - DEPLOYMENTSUBNETPARAMETERNAME=$PIPELINENAME-SSMparameterAMISUBNET
+      - DEPLOYMENTSUBNETPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+      - DEPLOYMENTSUBNETEMAILNAME=$PIPELINENAME-SSMparametercodeSNStopicEMAIL
+      - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text | awk '{print $4}')
+
+
   build:
     commands:
       - cd deployment_pipeline/
-      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file ami_pipeline.yaml --parameter-overrides PipelineName=$CODEBUILD_INITIATOR_NAME GitHTTPSURL=$CODECOMMITREPOHTTPSURL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
+ [BuilderVPC, BuilderPublicSubnet, NotificationEmailAddress] must have values
+
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file ami_pipeline.yaml --parameter-overrides ServiceName=$CODEBUILD_INITIATOR_NAME CodeBuildEnvironment='aws/codebuild/python:3.6.5' BuilderVPC=$DEPLOYMENTVPCPARAMETER BuilderPublicSubnet=$DEPLOYMENTSUBNETPARAMETER NotificationEmailAddress=$DEPLOYMENTSUBNETEMAIL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
       # - command
