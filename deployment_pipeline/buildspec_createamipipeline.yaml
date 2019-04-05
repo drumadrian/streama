@@ -63,8 +63,6 @@ phases:
   build:
     commands:
       - cd deployment_pipeline/
- [BuilderVPC, BuilderPublicSubnet, NotificationEmailAddress] must have values
-
       - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file ami_pipeline.yaml --parameter-overrides ServiceName=$CODEBUILD_INITIATOR_NAME CodeBuildEnvironment='aws/codebuild/python:3.6.5' BuilderVPC=$DEPLOYMENTVPCPARAMETER BuilderPublicSubnet=$DEPLOYMENTSUBNETPARAMETER NotificationEmailAddress=$DEPLOYMENTSUBNETEMAIL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
