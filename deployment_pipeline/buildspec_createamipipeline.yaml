@@ -50,7 +50,7 @@ phases:
       - SNSTOPICSSMPARAMETERNAME=$PIPELINENAME-SSMparametercodeSNStopicARN
       - SNSTOPICSSMPARAMETER=$(aws ssm get-parameter --name $SNSTOPICSSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
 
-      - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME--vpc-SSMparameterVPCID
+      - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
       - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
 
       - DEPLOYMENTSUBNETPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterAMISUBNET
