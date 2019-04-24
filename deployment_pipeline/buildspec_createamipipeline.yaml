@@ -59,23 +59,23 @@ phases:
       - DEPLOYMENTSUBNETEMAILNAME=$PIPELINENAME-SSMparametercodeSNStopicEMAIL
       - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text | awk '{print $4}')
 
-      - echo $REPONAMESSMPARAMETERNAME=
-      - echo REPONAMESSMPARAMETERNAME
+      - echo REPONAMESSMPARAMETERNAME=
+      - echo $REPONAMESSMPARAMETERNAME
 
-      - echo $DEPLOYMENTVPCPARAMETER=
-      - echo DEPLOYMENTVPCPARAMETER
+      - echo DEPLOYMENTVPCPARAMETER=
+      - echo $DEPLOYMENTVPCPARAMETER
 
-      - echo $DEPLOYMENTSUBNETPARAMETER=
-      - echo DEPLOYMENTSUBNETPARAMETER
+      - echo DEPLOYMENTSUBNETPARAMETER=
+      - echo $DEPLOYMENTSUBNETPARAMETER
 
-      - echo $DEPLOYMENTSUBNETEMAIL=
-      - echo DEPLOYMENTSUBNETEMAIL
+      - echo DEPLOYMENTSUBNETEMAIL=
+      - echo $DEPLOYMENTSUBNETEMAIL
 
 
   build:
     commands:
       - cd deployment_pipeline/
-      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file ami_pipeline.yaml --parameter-overrides ServiceName=$CODEBUILD_INITIATOR_NAME CodeBuildEnvironment='aws/codebuild/python:3.6.5' BuilderVPC=$DEPLOYMENTVPCPARAMETER BuilderPublicSubnet=$DEPLOYMENTSUBNETPARAMETER NotificationEmailAddress=$DEPLOYMENTSUBNETEMAIL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createamipipeline --template-file cloudformation_ami_pipeline.yaml --parameter-overrides ServiceName=$CODEBUILD_INITIATOR_NAME CodeBuildEnvironment='aws/codebuild/python:3.6.5' BuilderVPC=$DEPLOYMENTVPCPARAMETER BuilderPublicSubnet=$DEPLOYMENTSUBNETPARAMETER NotificationEmailAddress=$DEPLOYMENTSUBNETEMAIL --capabilities CAPABILITY_IAM --tags createdby=Adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
       # - command
