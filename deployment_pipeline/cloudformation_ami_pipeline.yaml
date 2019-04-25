@@ -134,7 +134,7 @@ Resources:
                 Type: LINUX_CONTAINER
                 ComputeType: BUILD_GENERAL1_SMALL
                 # Image: !Sub 'aws/codebuild/${CodeBuildEnvironment}'
-                Image: ${CodeBuildEnvironment}
+                Image: !Ref CodeBuildEnvironment
                 # Image: aws/codebuild/python:3.6.5
                 EnvironmentVariables:
                   - Name: BUILD_OUTPUT_BUCKET
