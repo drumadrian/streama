@@ -366,6 +366,7 @@ Resources:
                 - 'ssm:*'
                 - 'sns:*'
                 - 'cloudformation:*'
+                - 'codecommit:*'
                 - 'ssm:*'
                 - 'lambda:*'
                 - 'config:*'
