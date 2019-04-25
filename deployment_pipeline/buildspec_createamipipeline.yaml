@@ -45,30 +45,26 @@ phases:
       - echo $CODECOMMITREPOHTTPSURL
 
       - REPONAMESSMPARAMETERNAME=$PIPELINENAME-codecommitrepositoryname
-      - REPONAMESSMPARAMETER=$(aws ssm get-parameter --name $REPONAMESSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+      - REPONAMESSMPARAMETER=$(aws ssm get-parameter --name $REPONAMESSMPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
       - SNSTOPICSSMPARAMETERNAME=$PIPELINENAME-SSMparametercodeSNStopicARN
-      - SNSTOPICSSMPARAMETER=$(aws ssm get-parameter --name $SNSTOPICSSMPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+      - SNSTOPICSSMPARAMETER=$(aws ssm get-parameter --name $SNSTOPICSSMPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
       - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
-      - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+      - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
       - DEPLOYMENTSUBNETPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterAMISUBNET
-      - DEPLOYMENTSUBNETPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETPARAMETERNAME --region $AWS_REGION --output text | awk '{print $4}')
+      - DEPLOYMENTSUBNETPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
       - DEPLOYMENTSUBNETEMAILNAME=$PIPELINENAME-SSMparametercodeSNStopicEMAIL
-      - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text | awk '{print $4}')
+      - DEPLOYMENTSUBNETEMAIL=$(aws ssm get-parameter --name $DEPLOYMENTSUBNETEMAILNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
-      - echo REPONAMESSMPARAMETERNAME=
       - echo $REPONAMESSMPARAMETERNAME
 
-      - echo DEPLOYMENTVPCPARAMETER=
       - echo $DEPLOYMENTVPCPARAMETER
 
-      - echo DEPLOYMENTSUBNETPARAMETER=
       - echo $DEPLOYMENTSUBNETPARAMETER
 
-      - echo DEPLOYMENTSUBNETEMAIL=
       - echo $DEPLOYMENTSUBNETEMAIL
 
 
