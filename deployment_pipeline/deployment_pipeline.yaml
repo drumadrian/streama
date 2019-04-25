@@ -369,6 +369,7 @@ Resources:
                 - 'codecommit:*'
                 - 'events:*'
                 - 'codebuild:*'
+                - 'codepipeline:*'
                 - 'ssm:*'
                 - 'lambda:*'
                 - 'config:*'
