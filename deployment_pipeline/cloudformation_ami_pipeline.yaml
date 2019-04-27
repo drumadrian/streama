@@ -223,7 +223,7 @@ Resources:
             ArtifactStore: 
                 Location: !Ref BuildArtifactsBucket
                 Type: S3
-            Name: !Sub ${ServiceName}_pipeline
+            Name: !Sub ${ServiceName}-create-ami-pipeline
             RoleArn: !GetAtt PipelineExecutionRole.Arn
             Stages:
                 - 
@@ -237,7 +237,8 @@ Resources:
                         Provider: CodeCommit
                         Version: 1
                       Configuration:
-                        RepositoryName: !Sub '${ServiceName}_repo'
+                        RepositoryName: Fn::GetAtt: [ CodeRepository, Name ]
+                        # RepositoryName: !Sub '${ServiceName}_repo'
                         BranchName: master
                       OutputArtifacts:
                         - Name: SourceZip
