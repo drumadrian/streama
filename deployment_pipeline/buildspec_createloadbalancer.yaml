@@ -34,10 +34,20 @@ phases:
       - CODEBUILD_INITIATOR_NAME="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f2)"
       - echo $CODEBUILD_INITIATOR_NAME
 
+      - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
+      - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+
+      - DBSUBNET1NAME=$PIPELINENAME-vpc-SSMparameterDBSUBNET1
+      - DBSUBNET1=$(aws ssm get-parameter --name $DBSUBNET1NAME --region $AWS_REGION --output text --query 'Parameter.Value')
+
+      - DBSUBNET2NAME=$PIPELINENAME-vpc-SSMparameterDBSUBNET2
+      - DBSUBNET2=$(aws ssm get-parameter --name $DBSUBNET2NAME --region $AWS_REGION --output text --query 'Parameter.Value')
+
+
   build:
     commands:
       - cd deployment_pipeline/
-      # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-vpc --template-file cloudformation_vpc.yaml --parameter-overrides CIDRRangePrefix=10.250 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-loadbalancer --template-file cloudformation_createloadbalancer.yaml --parameter-overrides VpcId=$DEPLOYMENTVPCPARAMETER DBSubnet1=$DBSUBNET1 DBSubnet2=$DBSUBNET2 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
       # - command
