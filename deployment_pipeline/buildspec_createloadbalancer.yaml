@@ -34,6 +34,10 @@ phases:
       - CODEBUILD_INITIATOR_NAME="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f2)"
       - echo $CODEBUILD_INITIATOR_NAME
 
+      - PIPELINENAME=$CODEBUILD_INITIATOR_NAME
+      - echo PIPELINENAME=
+      - echo $PIPELINENAME      
+
       - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
       - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
