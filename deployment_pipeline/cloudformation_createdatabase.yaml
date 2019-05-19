@@ -96,7 +96,7 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties: 
       DBSubnetGroupDescription: !Sub 'Database SubnetGroup for ${AWS::StackName}'
-      DBSubnetGroupName: AuroraSubnetGroup
+      # DBSubnetGroupName: AuroraSubnetGroup
       SubnetIds: 
         - !Ref DBSubnet1
         - !Ref DBSubnet2
