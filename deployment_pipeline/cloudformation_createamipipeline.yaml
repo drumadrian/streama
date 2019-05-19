@@ -237,7 +237,7 @@ Resources:
                         Provider: CodeCommit
                         Version: 1
                       Configuration:
-                        RepositoryName: Fn::GetAtt: [ CodeRepository, Name ]
+                        RepositoryName: !GetAtt CodeRepository.Name
                         # RepositoryName: !Sub '${ServiceName}_repo'
                         BranchName: master
                       OutputArtifacts:
