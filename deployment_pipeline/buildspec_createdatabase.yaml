@@ -51,7 +51,7 @@ phases:
       - VPCSECURITYGROUPID=$(aws ssm get-parameter --name $VPCSECURITYGROUPIDNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
       - MASTERUSERPASSWORDNAME=$PIPELINENAME-secret
-      - MASTERUSERPASSWORD=$(aws ssm get-parameter --name $MASTERUSERPASSWORDNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+      - MASTERUSERPASSWORD=$(aws ssm get-parameter --name $MASTERUSERPASSWORDNAME --with-decryption --region $AWS_REGION --output text --query 'Parameter.Value')
 
 
 
