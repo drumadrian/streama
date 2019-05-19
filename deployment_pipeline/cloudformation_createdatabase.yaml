@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >  Aurora serverless cluster 
-                https://github.com/awslabs/aws-cloudformation-templates/tree/master/community/services/RDS/aurora-serverless
+Description: >
+  Aurora serverless cluster 
+  https://github.com/awslabs/aws-cloudformation-templates/tree/master/community/services/RDS/aurora-serverless
 
 
 Parameters:
