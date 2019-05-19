@@ -34,12 +34,20 @@ phases:
       - CODEBUILD_INITIATOR_NAME="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f2)"
       - echo $CODEBUILD_INITIATOR_NAME
 
+      ## SET ENVIRONMENT VARIABLES
+      - DEPLOYMENTVPCPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
+      - DEPLOYMENTVPCPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTVPCPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+
+      - VPCSECURITYGROUPIDNAME=$PIPELINENAME-vpc-SSMparameterAMISUBNET
+      - VPCSECURITYGROUPID=$(aws ssm get-parameter --name $VPCSECURITYGROUPIDNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+
   build:
     commands:
       - cd deployment_pipeline/
-      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createdatabase --template-file cloudformation_createdatabase.yaml --parameter-overrides CIDRRangePrefix=10.250 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
-      - aws ec2 describe-vpcs
-      - aws s3 ls
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createdatabase --template-file cloudformation_createdatabase.yaml --parameter-overrides CIDRRangePrefix=10.250 MasterUserPassword=$MASTERUSERPASSWORD, VpcId=$DEPLOYMENTVPCPARAMETER, DatabaseName=$DATABASENAME, VpcSecurityGroupId=VPCSECURITYGROUPID --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+
+      # - aws ec2 describe-vpcs
+      # - aws s3 ls
       # - command
 
   post_build:

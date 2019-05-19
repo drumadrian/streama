@@ -330,14 +330,14 @@ Resources:
           Value: !Sub "${AWS::StackName}"
 
 
-  ClientVPNSecurityGroup:
+  StreamaServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: Client VPN Security Group
+      GroupDescription: Streama Server Security Group
       VpcId: !Ref CustomVPC
       Tags:
         - Key: Name
-          Value: Client VPN Security Group
+          Value: Streama Server Security Group
 
 
   SSMparameterVPCID:
@@ -356,6 +356,18 @@ Resources:
       Name: !Sub "${AWS::StackName}-SSMparameterAMISUBNET"
       Type: String
       Value: !Ref SubnetServerA
+
+
+  SSMparameterStreamaServerSG:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The ID of the Streama server security group
+      Name: !Sub "${AWS::StackName}-SSMparameterStreamaServerSG"
+      Type: String
+      Value: !GetAtt StreamaServerSecurityGroup.GroupId
+
+
+
 
 
 

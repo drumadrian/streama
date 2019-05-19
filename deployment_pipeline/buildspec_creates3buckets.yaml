@@ -38,7 +38,7 @@ phases:
     commands:
       - cd deployment_pipeline/
       # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-vpc --template-file cloudformation_vpc.yaml --parameter-overrides CIDRRangePrefix=10.250 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
-      - aws ec2 describe-vpcs
+      # - aws ec2 describe-vpcs
       - aws s3 ls
       # - command
 

@@ -45,9 +45,9 @@ Parameters:
   BastionImageId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-ebs
-  BastionKeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: EC2 key used to connect to the bastion host
+  # BastionKeyName:
+  #   Type: AWS::EC2::KeyPair::KeyName
+  #   Description: EC2 key used to connect to the bastion host
 
 
 # Conditions: 

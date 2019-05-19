@@ -146,6 +146,60 @@ Resources:
             ServiceRole: !GetAtt CodeBuildServiceRole.Arn
             Source: 
                 Type: CODEPIPELINE
+                BuildSpec: deployment_pipeline/streama_packer_buildspec.yaml
+                GitCloneDepth: 0
+                Type: CODEPIPELINE
+            TimeoutInMinutes: 15
+
+
+
+
+
+  # CodeBuildProjectbuildlambdas:
+  #   Type: AWS::CodeBuild::Project
+  #   Properties:
+  #     Name: !Join [ -, [!Ref 'AWS::StackName', 'buildlambdas'] ]
+  #     ServiceRole: !Ref CodeBuildRole
+  #     Artifacts:
+  #       Type: CODEPIPELINE
+  #     BadgeEnabled: false
+  #     Environment:
+  #       Type: LINUX_CONTAINER
+  #       ComputeType: BUILD_GENERAL1_SMALL
+  #       Image: aws/codebuild/python:3.6.5
+  #       EnvironmentVariables:
+  #         - Name: codecommithttpsname
+  #           Value: !GetAtt coderepo.Name
+  #           Type: PLAINTEXT
+  #         - Name: codecommithttpsurl
+  #           Value: !GetAtt coderepo.CloneUrlHttp
+  #           Type: PLAINTEXT
+  #         - Name: codecommithttpsurlSSM
+  #           Value: !Sub "${AWS::StackName}-coderepoURL"
+  #           Type: PARAMETER_STORE
+  #         - Name: codepipelinesnstopicarn
+  #           Value: !Ref CodePipelineSNSTopic
+  #           Type: PLAINTEXT
+  #         - Name: codepipelinebranchname
+  #           Value: !Ref BranchName
+  #           Type: PLAINTEXT
+  #         - Name: idname
+  #           Value: !Ref IDName
+  #           Type: PARAMETER_STORE
+  #         - Name: secretidname
+  #           Value: !Ref SecretName
+  #           Type: PARAMETER_STORE
+  #         - Name: deploymentartifactstorebucketname
+  #           Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+  #           Type: PLAINTEXT
+  #     Source:
+  #       BuildSpec: deployment_pipeline/buildspec_buildlambdas.yaml
+  #       GitCloneDepth: 0
+  #       Type: CODEPIPELINE
+  #     TimeoutInMinutes: 10
+
+
+
     
     #############
     # Pipeline  #
