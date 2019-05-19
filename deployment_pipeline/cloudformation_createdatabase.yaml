@@ -42,9 +42,13 @@ Parameters:
     Type: AWS::EC2::VPC::Id
   VpcSecurityGroupId:
     Type: AWS::EC2::SecurityGroup::Id
-  BastionImageId:
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-ebs
+  DBSubnet1:
+    Type: String
+  DBSubnet2:
+    Type: String
+  # BastionImageId:
+  #   Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+  #   Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-ebs
   # BastionKeyName:
   #   Type: AWS::EC2::KeyPair::KeyName
   #   Description: EC2 key used to connect to the bastion host
@@ -59,6 +63,7 @@ Resources:
     Type: AWS::RDS::DBCluster
     Properties:
       Engine: aurora
+      DBSubnetGroupName: !Ref AuroraSubnetGroup
       EngineMode: serverless
       EngineVersion: !Ref EngineVersion
       DatabaseName: !Ref DatabaseName
@@ -86,6 +91,18 @@ Resources:
           ToPort: 3306
       SecurityGroupIngress: []
       VpcId: !Ref VpcId
+
+  AuroraSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: !Sub 'Database SubnetGroup for ${AWS::StackName}'
+      DBSubnetGroupName: AuroraSubnetGroup
+      SubnetIds: 
+        - !Ref DBSubnet1
+        - !Ref DBSubnet2
+      Tags: 
+        - Tag
+
 
 
   # BastionSecurityGroup:

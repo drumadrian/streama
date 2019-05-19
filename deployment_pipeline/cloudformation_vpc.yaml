@@ -352,7 +352,7 @@ Resources:
   SSMparameterAMISUBNET:
     Type: "AWS::SSM::Parameter"
     Properties: 
-      Description: The VPC ID of the deployment VPC SUBNET ID
+      Description: The SUBNET ID of the deployment VPC 
       Name: !Sub "${AWS::StackName}-SSMparameterAMISUBNET"
       Type: String
       Value: !Ref SubnetServerA
@@ -376,6 +376,21 @@ Resources:
       Value: !GetAtt StreamaServerSecurityGroup.GroupId
 
 
+  SSMparameterDBSUBNET1:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The SUBNET ID of the database SUBNET
+      Name: !Sub "${AWS::StackName}-SSMparameterDBSUBNET1"
+      Type: String
+      Value: !Ref SubnetServerA
+
+  SSMparameterDBSUBNET2:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The SUBNET ID of the database SUBNET
+      Name: !Sub "${AWS::StackName}-SSMparameterDBSUBNET2"
+      Type: String
+      Value: !Ref SubnetServerB
 
 
 
