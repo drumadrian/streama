@@ -10,16 +10,13 @@ Parameters:
     Description: 'The stack that created the VPC'
     Type: String
 
-  GitHTTPSURL:
-    Description: 'The HTTPS clone URL of the code repository'
-    Type: String
 
 
 Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: "KibanaUsers"
+      UserPoolName: "StreamaUsers"
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: true
       UsernameAttributes:
@@ -39,7 +36,7 @@ Resources:
   IdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      IdentityPoolName: "KibanaIDPool"
+      IdentityPoolName: "StreamaIDPool"
       AllowUnauthenticatedIdentities: true
       # CognitoIdentityProviders:
       #   - ClientId: !Ref UserPoolClient
