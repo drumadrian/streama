@@ -101,7 +101,8 @@ Resources:
         - !Ref DBSubnet1
         - !Ref DBSubnet2
       Tags: 
-        - Tag
+        - Key: StackName
+          Value: !Sub '${AWS::StackName}'
 
 
 
