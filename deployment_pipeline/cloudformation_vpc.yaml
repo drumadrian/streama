@@ -367,6 +367,15 @@ Resources:
       Value: !GetAtt StreamaServerSecurityGroup.GroupId
 
 
+  SSMparameterStreamaServerSGDELETEME:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Description: The ID of the Streama server security group
+      Name: !Sub "dev/adrian/${AWS::StackName}-SSMparameterStreamaServerSG"
+      Type: String
+      Value: !GetAtt StreamaServerSecurityGroup.GroupId
+
+
 
 
 
