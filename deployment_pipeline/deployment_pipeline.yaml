@@ -380,6 +380,7 @@ Resources:
                 - 'cognito-identity:*'
                 - 'cognito-idp:*'
                 - 'cloud9:*'
+                - 'rds:*'
                 Effect: Allow
                 Resource: '*'
         
