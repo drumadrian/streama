@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+
+    StackName:
+        Type: String
+        Default: strema
+        Description: StackName to be used in naming of resources
+
+
+Resources:
+
+    # S3 Bucket that the software system will use
+    SystemFilesBucket:
+        Type: AWS::S3::Bucket
+
+
+Outputs:
+
+        SystemFilesBucketOutput:
+            Description: S3 Bucket for storing Artifacts to support the software system 
+            Value: !Ref SystemFilesBucket
+
