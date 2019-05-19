@@ -223,7 +223,7 @@ Resources:
             ArtifactStore: 
                 Location: !Ref BuildArtifactsBucket
                 Type: S3
-            Name: !Sub ${ServiceName}-create-ami-pipeline
+            Name: !Sub ${ServiceName}-createamipipeline
             RoleArn: !GetAtt PipelineExecutionRole.Arn
             Stages:
                 - 
