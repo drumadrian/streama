@@ -548,9 +548,9 @@ Resources:
               OutputArtifacts:
                 - Name: output-createloadbalancer
 
-        - Name: Build_Lambdas_Create_Transcoder
+        - Name: Build_and_Deploy_Lambdas
           Actions:
-            - Name: Build_Lambdas
+            - Name: Build_Lambdas_then_Deploy
               ActionTypeId:
                 Category: Build
                 Owner: AWS
