@@ -381,6 +381,7 @@ Resources:
                 - 'cognito-idp:*'
                 - 'cloud9:*'
                 - 'rds:*'
+                - 'elasticloadbalancing:*'
                 Effect: Allow
                 Resource: '*'
         

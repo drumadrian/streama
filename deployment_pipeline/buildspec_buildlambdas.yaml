@@ -33,11 +33,37 @@ phases:
       - CODEBUILD_INITIATOR_SERVICE="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f1)"
       - CODEBUILD_INITIATOR_NAME="$(echo $CODEBUILD_INITIATOR | cut -d'/' -f2)"
       - echo $CODEBUILD_INITIATOR_NAME
+      - PIPELINENAME=$CODEBUILD_INITIATOR_NAME
+      - echo PIPELINENAME=
+      - echo $PIPELINENAME      
+
+      # - DEPLOYMENTBUCKETPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
+      # - DEPLOYMENTBUCKETPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTBUCKETPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+      - DEPLOYMENTBUCKETPARAMETER=$deploymentartifactstorebucketname
+
+      - DEPLOYMENTBUCKETKEYPARAMETER=transcoder.zip
+
+
+      deploymentartifactstorebucketname
 
   build:
     commands:
       - cd deployment_pipeline/
-      # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-vpc --template-file cloudformation_vpc.yaml --parameter-overrides CIDRRangePrefix=10.250 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+
+      - echo -e "\n\n"
+      - echo -e "......Building   streama lambda zip file"
+      - echo -e "\n\n"
+      - rm $DEPLOYMENTBUCKETKEYPARAMETER
+      - cd venv/lib/python3.6/site-packages/
+      - zip -r9 ../../../../function.zip .
+      - cd ../../../../
+      - cp aws-elasticsearch-index-curator.py index.py
+      - zip -g function.zip index.py
+      - mv function.zip $DEPLOYMENTBUCKETKEYPARAMETER
+      - # Cleanup files used in the process of building the zip archive
+      - rm index.py
+
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-vpc --template-file cloudformation_vpc.yaml --parameter-overrides zipfilebucket=DEPLOYMENTBUCKETPARAMETER zipfilekey=DEPLOYMENTBUCKETKEYPARAMETER --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
       # - command
