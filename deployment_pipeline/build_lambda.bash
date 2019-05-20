@@ -1,3 +1,6 @@
+# Create python 3 virtual environment
+# python3 -m venv venv
+
 echo -e "\n\n"
 echo -e "......Building   streama lambda zip file"
 echo -e "\n\n"
