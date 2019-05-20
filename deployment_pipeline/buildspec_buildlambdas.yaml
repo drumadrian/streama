@@ -49,21 +49,7 @@ phases:
   build:
     commands:
       - cd deployment_pipeline/
-
-      - echo -e "\n\n"
-      - echo -e "......Building   streama lambda zip file"
-      - echo -e "\n\n"
-      - rm $DEPLOYMENTBUCKETKEYPARAMETER
-      - cd venv/lib/python3.6/site-packages/
-      - zip -r9 ../../../../function.zip .
-      - cd ../../../../
-      - cp aws-elasticsearch-index-curator.py index.py
-      - zip -g function.zip index.py
-      - mv function.zip $DEPLOYMENTBUCKETKEYPARAMETER
-      - # Cleanup files used in the process of building the zip archive
-      - rm index.py
-
-      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-vpc --template-file cloudformation_vpc.yaml --parameter-overrides zipfilebucket=DEPLOYMENTBUCKETPARAMETER zipfilekey=DEPLOYMENTBUCKETKEYPARAMETER --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-buildlambda --template-file cloudformation_buildlambdas.yaml --parameter-overrides zipfilebucket=DEPLOYMENTBUCKETPARAMETER zipfilekey=DEPLOYMENTBUCKETKEYPARAMETER --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
       # - command
