@@ -40,11 +40,7 @@ phases:
       # - DEPLOYMENTBUCKETPARAMETERNAME=$PIPELINENAME-vpc-SSMparameterVPCID
       # - DEPLOYMENTBUCKETPARAMETER=$(aws ssm get-parameter --name $DEPLOYMENTBUCKETPARAMETERNAME --region $AWS_REGION --output text --query 'Parameter.Value')
       - DEPLOYMENTBUCKETPARAMETER=$deploymentartifactstorebucketname
-
       - DEPLOYMENTBUCKETKEYPARAMETER=transcoder.zip
-
-
-      deploymentartifactstorebucketname
 
   build:
     commands:
