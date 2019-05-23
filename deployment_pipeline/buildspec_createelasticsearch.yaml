@@ -59,7 +59,7 @@ phases:
   build:
     commands:
       - cd deployment_pipeline/
-      # - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createdatabase --template-file cloudformation_createdatabase.yaml --parameter-overrides CIDRRangePrefix=10.250 MasterUserPassword=$MASTERUSERPASSWORD VpcId=$DEPLOYMENTVPCPARAMETER DatabaseName=streama VpcSecurityGroupId=$VPCSECURITYGROUPID DBSubnet1=$DBSUBNET1 DBSubnet2=$DBSUBNET2 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createelasticsearch --template-file cloudformation_createelasticsearch.yaml --parameter-overrides CIDRRangePrefix=10.250 MasterUserPassword=$MASTERUSERPASSWORD VpcId=$DEPLOYMENTVPCPARAMETER DatabaseName=streama VpcSecurityGroupId=$VPCSECURITYGROUPID DBSubnet1=$DBSUBNET1 DBSubnet2=$DBSUBNET2 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
 
       # - aws ec2 describe-vpcs
       # - aws s3 ls
