@@ -490,7 +490,7 @@ Resources:
                 - Name: output-createamipipeline
 
 
-        - Name: Create_Database_Create_S3_Buckets_Create_Cognito_Pool_Create_Load_Balancer
+        - Name: Create_Database_Create_S3_Buckets_Create_Cognito_Pool_Create_Load_Balancer_Create_Elasticsearch
           Actions:
             - Name: Create_Database
               ActionTypeId:
@@ -505,6 +505,20 @@ Resources:
               RunOrder: '1'
               OutputArtifacts:
                 - Name: output-createdatabase
+
+            - Name: Create_Elasticsearch
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              InputArtifacts:
+                - Name: code
+              Configuration:
+                ProjectName: !Join [ -, [!Ref 'AWS::StackName', 'createelasticsearch'] ]
+              RunOrder: '1'
+              OutputArtifacts:
+                - Name: output-createelasticsearch
 
             - Name: Create_S3_Buckets
               ActionTypeId:
@@ -725,6 +739,53 @@ Resources:
         GitCloneDepth: 0
         Type: CODEPIPELINE
       TimeoutInMinutes: 10
+
+
+
+
+
+  CodeBuildProjectcreateelasticsearch:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Join [ -, [!Ref 'AWS::StackName', 'createelasticsearch'] ]
+      ServiceRole: !Ref CodeBuildRole
+      Artifacts:
+        Type: CODEPIPELINE
+      BadgeEnabled: false
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.6.5
+        EnvironmentVariables:
+          - Name: codecommithttpsname
+            Value: !GetAtt coderepo.Name
+            Type: PLAINTEXT
+          - Name: codecommithttpsurl
+            Value: !GetAtt coderepo.CloneUrlHttp
+            Type: PLAINTEXT
+          - Name: codecommithttpsurlSSM
+            Value: !Sub "${AWS::StackName}-coderepoURL"
+            Type: PARAMETER_STORE
+          - Name: codepipelinesnstopicarn
+            Value: !Ref CodePipelineSNSTopic
+            Type: PLAINTEXT
+          - Name: codepipelinebranchname
+            Value: !Ref BranchName
+            Type: PLAINTEXT
+          - Name: idname
+            Value: !Ref IDName
+            Type: PARAMETER_STORE
+          - Name: secretidname
+            Value: !Ref SecretName
+            Type: PARAMETER_STORE
+          - Name: deploymentartifactstorebucketname
+            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Type: PLAINTEXT
+      Source:
+        BuildSpec: deployment_pipeline/buildspec_createelasticsearch.yaml
+        GitCloneDepth: 0
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 20
 
 
 
