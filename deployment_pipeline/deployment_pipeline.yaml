@@ -637,7 +637,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_createamipipeline.yaml
@@ -683,7 +683,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_buildvpc.yaml
@@ -732,7 +732,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_createdatabase.yaml
@@ -779,7 +779,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_createelasticsearch.yaml
@@ -827,7 +827,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_creates3buckets.yaml
@@ -874,7 +874,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_createcognitopool.yaml
@@ -921,7 +921,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_createloadbalancer.yaml
@@ -968,7 +968,7 @@ Resources:
             Value: !Ref SecretName
             Type: PARAMETER_STORE
           - Name: deploymentartifactstorebucketname
-            Value: !Join [ -, [!Ref 'AWS::StackName', 'artifactstorebucket'] ]
+            Value: !Ref ArtifactStoreBucketName
             Type: PLAINTEXT
       Source:
         BuildSpec: deployment_pipeline/buildspec_buildlambdas.yaml

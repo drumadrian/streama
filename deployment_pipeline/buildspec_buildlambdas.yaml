@@ -45,7 +45,7 @@ phases:
   build:
     commands:
       - cd deployment_pipeline/
-      - aws s3 cp transcoder.zip s3://$DEPLOYMENTBUCKETPARAMETER/transcoder.zip
+      - aws s3 cp transcoder.zip s3://$DEPLOYMENTBUCKETPARAMETER/DEPLOYMENTBUCKETKEYPARAMETER
       - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-buildlambda --template-file cloudformation_buildlambdas.yaml --parameter-overrides zipfilebucket=DEPLOYMENTBUCKETPARAMETER zipfilekey=DEPLOYMENTBUCKETKEYPARAMETER --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
       # - aws ec2 describe-vpcs
       # - aws s3 ls
