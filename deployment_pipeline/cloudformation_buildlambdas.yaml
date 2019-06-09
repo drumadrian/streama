@@ -26,7 +26,7 @@ Resources:
   transcoderRoleLambda:
     Type: 'AWS::IAM::Role'
     Properties:
-      # RoleName: !Sub "${AWS::StackName}-transcoderRoleLambda"
+      RoleName: !Sub "${AWS::StackName}-transcoderRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -79,7 +79,7 @@ Resources:
   CreatetranscoderAssumeRolePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      ManagedPolicyName: transcoder-controller-ec2-policy
+      ManagedPolicyName: !Sub "${AWS::StackName}-ManagedPolicyName"
       Description: Policy for creating transcoder-controller-ec2-policy
       Path: /
       PolicyDocument:
