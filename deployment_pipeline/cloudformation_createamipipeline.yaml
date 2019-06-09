@@ -23,6 +23,17 @@ Parameters:
         Type: String
         Description: Email to receive new AMI ID created by AMI Builder
 
+    BranchName:
+      Description: A name for the codecommit repo Branch
+      Type: String
+      Default: "master"
+
+    CodeRepository:
+      Description: A name for the codecommit repo 
+      Type: String
+      Default: "pipeline"
+
+
 Metadata: 
   AWS::CloudFormation::Interface: 
     ParameterGroups: 
@@ -60,6 +71,8 @@ Metadata:
         default: "Who should I notify upon completion?"
 
 
+
+
 Resources:
 
     ##########
@@ -67,11 +80,11 @@ Resources:
     ##########
 
     # Code repository for AMI Builder
-    CodeRepository:
-        Type: AWS::CodeCommit::Repository
-        Properties:
-            RepositoryName: !Sub '${ServiceName}-repo-ami-builder'
-            RepositoryDescription: !Sub 'Repository for ${ServiceName} service'
+    # CodeRepository:
+    #     Type: AWS::CodeCommit::Repository
+    #     Properties:
+    #         RepositoryName: !Sub '${ServiceName}-repo-ami-builder'
+    #         RepositoryDescription: !Sub 'Repository for ${ServiceName} service'
 
 
     #########
@@ -291,9 +304,9 @@ Resources:
                         Provider: CodeCommit
                         Version: 1
                       Configuration:
-                        RepositoryName: !GetAtt CodeRepository.Name
+                        RepositoryName: !Ref CodeRepository
                         # RepositoryName: !Sub '${ServiceName}_repo'
-                        BranchName: master
+                        BranchName: !Ref BranchName
                       OutputArtifacts:
                         - Name: SourceZip
                       RunOrder: 1
