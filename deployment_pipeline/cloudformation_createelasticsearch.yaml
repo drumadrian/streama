@@ -88,7 +88,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: '*'
+              AWS: !Sub ${AWS::AccountId}
             Action: 'es:*'
             Resource: '*'
       AdvancedOptions:
