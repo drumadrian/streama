@@ -45,21 +45,21 @@ phases:
       - DBSUBNET1NAME=$PIPELINENAME-vpc-SSMparameterDBSUBNET1
       - DBSUBNET1=$(aws ssm get-parameter --name $DBSUBNET1NAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
-      - DBSUBNET2NAME=$PIPELINENAME-vpc-SSMparameterDBSUBNET2
-      - DBSUBNET2=$(aws ssm get-parameter --name $DBSUBNET2NAME --region $AWS_REGION --output text --query 'Parameter.Value')
+      # - DBSUBNET2NAME=$PIPELINENAME-vpc-SSMparameterDBSUBNET2
+      # - DBSUBNET2=$(aws ssm get-parameter --name $DBSUBNET2NAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
-      - VPCSECURITYGROUPIDNAME=$PIPELINENAME-vpc-SSMparameterStreamaServerSG
-      - VPCSECURITYGROUPID=$(aws ssm get-parameter --name $VPCSECURITYGROUPIDNAME --region $AWS_REGION --output text --query 'Parameter.Value')
+      # - VPCSECURITYGROUPIDNAME=$PIPELINENAME-vpc-SSMparameterStreamaServerSG
+      # - VPCSECURITYGROUPID=$(aws ssm get-parameter --name $VPCSECURITYGROUPIDNAME --region $AWS_REGION --output text --query 'Parameter.Value')
 
-      - MASTERUSERPASSWORDNAME=$PIPELINENAME-secret
-      - MASTERUSERPASSWORD=$(aws ssm get-parameter --name $MASTERUSERPASSWORDNAME --with-decryption --region $AWS_REGION --output text --query 'Parameter.Value')
+      # - MASTERUSERPASSWORDNAME=$PIPELINENAME-secret
+      # - MASTERUSERPASSWORD=$(aws ssm get-parameter --name $MASTERUSERPASSWORDNAME --with-decryption --region $AWS_REGION --output text --query 'Parameter.Value')
 
 
 
   build:
     commands:
       - cd deployment_pipeline/
-      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createelasticsearch --template-file cloudformation_createelasticsearch.yaml --parameter-overrides CIDRRangePrefix=10.250 MasterUserPassword=$MASTERUSERPASSWORD VpcId=$DEPLOYMENTVPCPARAMETER DatabaseName=streama VpcSecurityGroupId=$VPCSECURITYGROUPID DBSubnet1=$DBSUBNET1 DBSubnet2=$DBSUBNET2 --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
+      - aws cloudformation deploy --stack-name $CODEBUILD_INITIATOR_NAME-createelasticsearch --template-file cloudformation_createelasticsearch.yaml --parameter-overrides PipelineName=$PIPELINENAME DBSubnet1=$DBSUBNET1 VpcId=$DEPLOYMENTVPCPARAMETER --capabilities CAPABILITY_IAM --tags createdby=adrian --no-fail-on-empty-changeset --debug
 
       # - aws ec2 describe-vpcs
       # - aws s3 ls

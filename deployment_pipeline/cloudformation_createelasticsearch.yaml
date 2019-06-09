@@ -1,51 +1,57 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >
-  Aurora serverless cluster 
-  https://github.com/awslabs/aws-cloudformation-templates/tree/master/community/services/RDS/aurora-serverless
-
+  Elasticsearch cluster
 
 Parameters:
 
-  CIDRRangePrefix:
-    Description: 'Provide a valid Class-B CIDR Block Range.'
-    ConstraintDescription: 'Must provide the first two octets seperated by a period. ( Example: "10.250" )'
-    Type: String
-    AllowedPattern: '((\d{1,3})\.){1}\d{1,3}'
-    MinLength: 3
-    MaxLength: 7
+  # CIDRRangePrefix:
+  #   Description: 'Provide a valid Class-B CIDR Block Range.'
+  #   ConstraintDescription: 'Must provide the first two octets seperated by a period. ( Example: "10.250" )'
+  #   Type: String
+  #   AllowedPattern: '((\d{1,3})\.){1}\d{1,3}'
+  #   MinLength: 3
+  #   MaxLength: 7
 
-  HostedZoneName:
-    Description: 'Provide a valid internal Domain Name for the crawler.'
-    ConstraintDescription: 'Must provide valid internal Domain Name. ( Example: "pollywhitepapers.com" )'
-    Type: String
-    Default: private.adrianws.com
+  # HostedZoneName:
+  #   Description: 'Provide a valid internal Domain Name for the crawler.'
+  #   ConstraintDescription: 'Must provide valid internal Domain Name. ( Example: "pollywhitepapers.com" )'
+  #   Type: String
+  #   Default: private.adrianws.com
 
-  ProvisionNATgateways:
-    Description: 'NAT Gateways are expensive for personal projects.  This is a feature to not create them'
-    ConstraintDescription: 'true or false'
-    Type: String
-    Default: false
+  # ProvisionNATgateways:
+  #   Description: 'NAT Gateways are expensive for personal projects.  This is a feature to not create them'
+  #   ConstraintDescription: 'true or false'
+  #   Type: String
+  #   Default: false
 
+  PipelineName:
+    Description: 'The stack that created the VPC'
+    Type: String
 
-  DatabaseName:
-    Type: String
-  EngineVersion:
-    Type: String
-    Default: '5.6'
-  MasterUsername:
-    Type: String
-    Default: root
-  MasterUserPassword:
-    Type: String
-    NoEcho: true
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-  VpcSecurityGroupId:
-    Type: AWS::EC2::SecurityGroup::Id
   DBSubnet1:
     Type: String
+
   DBSubnet2:
     Type: String
+
+  VpcId:
+    Type: String
+    
+  # DatabaseName:
+  #   Type: String
+  # EngineVersion:
+  #   Type: String
+  #   Default: '5.6'
+  # MasterUsername:
+  #   Type: String
+  #   Default: root
+  # MasterUserPassword:
+  #   Type: String
+  #   NoEcho: true
+  # VpcId:
+  #   Type: AWS::EC2::VPC::Id
+  # VpcSecurityGroupId:
+  #   Type: AWS::EC2::SecurityGroup::Id
   # BastionImageId:
   #   Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
   #   Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-ebs
@@ -57,16 +63,9 @@ Parameters:
 # Conditions: 
 #   ProvisionNATgateways: !Equals [ !Ref ProvisionNATgateways, true ]
 
-
-
-
-  PipelineName:
-    Description: 'The stack that created the VPC'
-    Type: String
-
-  GitHTTPSURL:
-    Description: 'The HTTPS clone URL of the code repository'
-    Type: String
+  # GitHTTPSURL:
+  #   Description: 'The HTTPS clone URL of the code repository'
+  #   Type: String
 
 Resources:
 
@@ -104,7 +103,8 @@ Resources:
 
       VPCOptions:
         SubnetIds:
-          - Fn::ImportValue: !Sub "${PipelineName}-vpc-SubnetServerA"
+          - !Ref DBSubnet1
+          - !Ref DBSubnet2
         SecurityGroupIds:
           - !Ref meetupElasticSearchSecurityGroup
 
@@ -115,7 +115,8 @@ Resources:
     Properties:
       GroupDescription: meetup ElasticSearch Security Group
       VpcId:
-        Fn::ImportValue: !Sub "${PipelineName}-vpc-VPCID"
+        !Ref VpcId
+        # Fn::ImportValue: !Sub "${PipelineName}-vpc-VPCID"
       Tags:
         - Key: Name
           Value: meetup ElasticSearch Security Group
