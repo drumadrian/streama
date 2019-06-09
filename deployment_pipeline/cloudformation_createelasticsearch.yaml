@@ -36,7 +36,7 @@ Parameters:
 
   VpcId:
     Type: String
-    
+
   # DatabaseName:
   #   Type: String
   # EngineVersion:
@@ -75,13 +75,13 @@ Resources:
       # DomainName: !Sub "${PipelineName}-es"
       ElasticsearchVersion: '6.3'
       ElasticsearchClusterConfig:
-        InstanceCount: '1'
-        InstanceType: m4.xlarge.elasticsearch
-        ZoneAwarenessEnabled: "false"
+        InstanceCount: '2'
+        InstanceType: m5.large.elasticsearch
+        ZoneAwarenessEnabled: "true"
       EBSOptions:
         EBSEnabled: 'true'
         Iops: 0
-        VolumeSize: 100
+        VolumeSize: 20
         VolumeType: gp2
       AccessPolicies:
         Version: 2012-10-17
